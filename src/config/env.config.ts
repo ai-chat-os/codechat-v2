@@ -127,6 +127,7 @@ export interface Env {
   SESSION_SECRET: string;
   S3?: Bucket;
   WA_VERSION: string;
+  FETCH_PROXY_URL: string;
 }
 
 export type Key = keyof Env;

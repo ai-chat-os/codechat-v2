@@ -149,6 +149,7 @@ import {
   unlinkSync,
   writeFileSync,
 } from 'fs';
+import { HttpsProxyAgent } from 'https-proxy-agent';
 
 type InstanceQrCode = {
   count: number;
@@ -519,6 +520,16 @@ export class WAStartupService {
     const { EXPIRATION_TIME } = this.configService.get<QrCode>('QRCODE');
     const CONNECTION_TIMEOUT = this.configService.get<number>('CONNECTION_TIMEOUT');
 
+    let agent: HttpsProxyAgent<string> | null = null;
+    try {
+      agent = await this.getProxy();
+      this.logger.warn(
+        `Using proxy: "${agent}" - "${JSON.stringify(agent?.options) ?? 'none'}"`,
+      );
+    } catch (error) {
+      this.logger.error(error);
+    }
+
     const socketConfig: UserFacingSocketConfig = {
       auth: {
         creds: this.authState.state.creds,
@@ -527,6 +538,8 @@ export class WAStartupService {
           P({ level: 'silent' }) as any,
         ),
       },
+      agent: agent,
+      fetchAgent: agent,
       logger: P({ level: 'silent' }) as any,
       printQRInTerminal: false,
       browser,
@@ -545,6 +558,25 @@ export class WAStartupService {
     };
 
     return makeWASocket(socketConfig);
+  }
+
+  private async getProxy(): Promise<HttpsProxyAgent<string> | null> {
+    const fetchProxyUrl: string = this.configService.get('FETCH_PROXY_URL');
+    let agent: HttpsProxyAgent<string> | null;
+
+    if (fetchProxyUrl) {
+      const data = await fetch(`${fetchProxyUrl}/association/${this.instanceName}`);
+      const r = await data.json();
+      this.logger.warn(`Json data: ${JSON.stringify(r)}`);
+      if (r.url) {
+        agent = new HttpsProxyAgent(r.url);
+        this.logger.warn(`Using proxy: ${r.url}`);
+      } else {
+        this.logger.warn(' ----- Cant get proxy connection -----');
+      }
+    }
+    this.logger.warn(` ---- Returning proxy: ${JSON.stringify(agent)} ---`);
+    return agent;
   }
 
   public async reloadConnection(): Promise<WASocket> {

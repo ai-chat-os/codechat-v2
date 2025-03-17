@@ -16,6 +16,7 @@ lerna-debug.log*
 /package-lock.json
 
 # IDE - VSCode
+.idea/*
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
