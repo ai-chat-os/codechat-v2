@@ -246,6 +246,7 @@ export class ConfigService {
         USE_SSL: process.env?.S3_USE_SSL === 'true',
       },
       WA_VERSION: process.env?.WA_VERSION,
+      FETCH_PROXY_URL: process.env?.FETCH_PROXY_URL,
     };
   }
 }
