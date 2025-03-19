@@ -65,7 +65,7 @@ services:
       - public_network
 
   postgres_server:
-    image: postgres:16
+    image: postgres:17
     container_name: postgres_server
     environment:
       POSTGRES_DB: codechat
@@ -73,8 +73,6 @@ services:
       POSTGRES_PASSWORD: "f8Vi6XGgHnBkGj2qMTBm3k4XQGC3yBWE2"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
     networks:
       - db
       - public_network
@@ -86,4 +84,3 @@ networks:
 volumes:
   instances_connecteds:
   postgres_data:
-
