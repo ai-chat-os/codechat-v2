@@ -65,7 +65,7 @@ services:
       - public_network
 
   postgres_server:
-    image: postgres:16s
+    image: postgres:16
     container_name: postgres_server
     environment:
       POSTGRES_DB: codechat
